@@ -1,0 +1,20 @@
+### Criar Game
+POST http://localhost:8080/games
+Content-Type: application/json
+
+{
+  "title": "God of War",
+  "description": "Jogo de ação épico",
+  "genre": "ACTION",
+  "developer": "Santa Monica Studio",
+  "publisher": "Sony",
+  "releaseDate": "2018-04-20",
+  "price": 199.90,
+  "rating": 9.8,
+  "active": true
+}
+
+###
+
+### Listar todos
+GET http://localhost:8080/games

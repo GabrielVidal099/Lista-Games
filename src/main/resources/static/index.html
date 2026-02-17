@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <title>Games</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Lista de Games</h1>
+
+    <!-- FORMULÁRIO -->
+    <div class="card">
+        <h2>Novo Game</h2>
+
+        <form id="gameForm">
+            <input type="text" id="title" placeholder="Título" required>
+
+            <!-- Select para gênero -->
+            <select id="genre" required>
+                <option value="">Selecione o gênero</option>
+                <option value="SIMULATION">Simulação</option>
+                <option value="FPS">FPS</option>
+                <option value="HORROR">Terror</option>
+                <option value="RACING">Corrida</option>
+                <option value="ADVENTURE">Aventura</option>
+                <option value="FIGHTING">Luta</option>
+                <option value="STRATEGY">Estratégia</option>
+                <option value="ACTION">Ação</option>
+                <option value="SPORTS">Esportes</option>
+                <option value="RPG">RPG</option>
+                <option value="OTHER">Outros</option>
+            </select>
+
+            <input type="number" id="rating" placeholder="Nota" step="0.1">
+            <input type="text" id="imageUrl" placeholder="URL da Capa">
+            <label>
+                Ativo
+                <input type="checkbox" id="active" checked>
+            </label>
+
+            <button type="submit">Salvar</button>
+        </form>
+    </div>
+
+    <!-- LISTA -->
+    <div class="card">
+        <button onclick="carregar()">Carregar Lista</button>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Capa</th>
+                <th>Título</th>
+                <th>Gênero</th>
+                <th>Nota</th>
+                <th>Ativo</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody id="tbody">
+            <tr><td colspan="6" class="muted">Clique em Carregar...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/80x100';
+
+    // CARREGAR LISTA
+    async function carregar() {
+        const tbody = document.getElementById("tbody");
+        tbody.innerHTML = `<tr><td colspan="6" class="muted">Carregando...</td></tr>`;
+
+        try {
+            const resp = await fetch("http://localhost:8080/games");
+            if (!resp.ok) throw new Error("Erro HTTP: " + resp.status);
+
+            const dados = await resp.json();
+
+            if (!dados.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="muted">Nenhum game cadastrado.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = dados.map(g => {
+                const imgSrc = g.imageUrl && g.imageUrl.trim() !== '' ? g.imageUrl : PLACEHOLDER_IMAGE;
+                return `
+                <tr>
+                    <td>
+                        <img class="cover" src="${imgSrc}" alt="capa" width="80" height="100">
+                    </td>
+                    <td>${g.title || ''}</td>
+                    <td><span class="badge">${g.genre || ''}</span></td>
+                    <td><span class="rating">${g.rating || '-'}</span></td>
+                    <td>${g.active ? '✅' : '❌'}</td>
+                    <td>
+                        <button onclick="removerGame(${g.id})">Excluir</button>
+                    </td>
+                </tr>
+                `;
+            }).join("");
+
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="6" class="error">Falhou: ${e.message}</td></tr>`;
+        }
+    }
+
+    // SALVAR GAME
+    document.getElementById("gameForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        // Ajusta URL da imagem e limita a 500 caracteres
+        let imageUrlRaw = document.getElementById("imageUrl").value;
+        let imageUrl = imageUrlRaw.trim().substring(0, 500);
+        if (!imageUrl) imageUrl = PLACEHOLDER_IMAGE;
+
+        const game = {
+            title: document.getElementById("title").value,
+            genre: document.getElementById("genre").value,
+            rating: parseFloat(document.getElementById("rating").value) || 0,
+            imageUrl: imageUrl,
+            active: document.getElementById("active").checked
+        };
+
+        try {
+            const resp = await fetch("http://localhost:8080/games", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(game)
+            });
+
+            if (!resp.ok) {
+                const erro = await resp.text();
+                throw new Error(erro);
+            }
+
+            alert("Game cadastrado com sucesso!");
+            this.reset();
+            carregar();
+
+        } catch (err) {
+            alert("Erro ao cadastrar: " + err.message);
+        }
+    });
+
+    // REMOVER GAME
+    async function removerGame(id) {
+        if (!confirm("Confirma a exclusão deste jogo?")) return;
+
+        try {
+            const resp = await fetch(`http://localhost:8080/games/${id}`, { method: "DELETE" });
+
+            if (!resp.ok) {
+                const erro = await resp.text();
+                throw new Error(erro);
+            }
+
+            alert("Game removido com sucesso!");
+            carregar();
+
+        } catch (err) {
+            alert("Erro ao remover: " + err.message);
+        }
+    }
+</script>
+
+</body>
+</html>
