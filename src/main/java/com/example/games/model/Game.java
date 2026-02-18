@@ -56,10 +56,6 @@ public class Game {
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    @DecimalMin("0.00")
-    @Digits(integer = 10, fraction = 2)
-    @Column(precision = 12, scale = 2)
-    private BigDecimal price;
 
     @Size(max = 500)
     @Column(name = "image_url", length = 500)
@@ -87,18 +83,16 @@ public class Game {
     private Instant updatedAt;
 
     public enum Genre {
-        ACTION,
-        ADVENTURE,
+        ACAO,
+        AVENTURA,
         RPG,
-        SPORTS,
-        RACING,
-        STRATEGY,
-        SIMULATION,
-        PUZZLE,
-        HORROR,
+        ESPORTES,
+        CORRIDA,
+        ESTRATEGIA,
+        SIMULACAO,
+        TERROR,
         FPS,
-        FIGHTING,
-        INDIE,
-        OTHER
+        LUTA,
+        OUTROS
     }
 }

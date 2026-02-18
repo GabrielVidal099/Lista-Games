@@ -48,7 +48,6 @@ public class GamesController {
         existing.setDeveloper(game.getDeveloper());
         existing.setPublisher(game.getPublisher());
         existing.setReleaseDate(game.getReleaseDate());
-        existing.setPrice(game.getPrice());
         existing.setRating(game.getRating());
         existing.setActive(game.getActive());
 
