@@ -10,8 +10,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/games")
-// Adicione esta linha abaixo para liberar o acesso do seu site
-@CrossOrigin(origins = "https://listagames.infinityfreeapp.com")
+
+@CrossOrigin(origins = {
+        "https://listagames.infinityfreeapp.com",
+        "https://marcy-endamebic-denyse.ngrok-free.dev"
+})
 public class GamesController {
 
     private final GameRepository repository;
