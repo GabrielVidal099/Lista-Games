@@ -10,6 +10,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/games")
+// Adicione esta linha abaixo para liberar o acesso do seu site
+@CrossOrigin(origins = "https://listagames.infinityfreeapp.com")
 public class GamesController {
 
     private final GameRepository repository;
@@ -35,7 +37,6 @@ public class GamesController {
         game.setId(null);
         return repository.save(game);
     }
-
 
     @PutMapping("/{id}")
     public Game update(@PathVariable Long id, @Valid @RequestBody Game game) {
